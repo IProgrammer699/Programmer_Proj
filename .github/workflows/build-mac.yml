@@ -1,4 +1,6 @@
-name: Build macOS App
+
+```yaml
+name: Build macOS DMG
 
 on:
   workflow_dispatch:
@@ -16,23 +18,29 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Abhängigkeiten installieren
+      - name: PyInstaller installieren
         run: |
           python -m pip install --upgrade pip
           pip install pyinstaller
 
-      - name: App erstellen
+      - name: Python-Programm bauen
         run: |
-          pyinstaller --windowed --name MeinProgramm main.py
+          pyinstaller --windowed --name USBDeviceMac usb_device_mac.py
 
       - name: DMG erstellen
         run: |
           mkdir dmg
-          cp -R "dist/MeinProgramm.app" dmg/
-          hdiutil create -volname "MeinProgramm" -srcfolder dmg -ov -format UDZO "MeinProgramm.dmg"
+          cp -R "dist/USBDeviceMac.app" dmg/
+          hdiutil create \
+            -volname "USBDeviceMac" \
+            -srcfolder dmg \
+            -ov \
+            -format UDZO \
+            "USBDeviceMac.dmg"
 
-      - name: DMG bereitstellen
+      - name: DMG als Download bereitstellen
         uses: actions/upload-artifact@v4
         with:
-          name: MeinProgramm-macOS
-          path: MeinProgramm.dmg
+          name: USBDeviceMac-macOS
+          path: USBDeviceMac.dmg
+```
