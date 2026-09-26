@@ -1,0 +1,38 @@
+name: Build macOS App
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - name: Code herunterladen
+        uses: actions/checkout@v4
+
+      - name: Python einrichten
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Abhängigkeiten installieren
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyinstaller
+
+      - name: App erstellen
+        run: |
+          pyinstaller --windowed --name MeinProgramm main.py
+
+      - name: DMG erstellen
+        run: |
+          mkdir dmg
+          cp -R "dist/MeinProgramm.app" dmg/
+          hdiutil create -volname "MeinProgramm" -srcfolder dmg -ov -format UDZO "MeinProgramm.dmg"
+
+      - name: DMG bereitstellen
+        uses: actions/upload-artifact@v4
+        with:
+          name: MeinProgramm-macOS
+          path: MeinProgramm.dmg
